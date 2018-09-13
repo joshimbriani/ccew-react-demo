@@ -1,5 +1,8 @@
 import React from 'react';
 import './App.css';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as boardActions from './redux/actions/boardActions';
 
 class Square extends React.Component {
   
@@ -12,11 +15,11 @@ class Square extends React.Component {
   }
 }
 
-class Board extends React.Component {
+class BoardComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(9).fill(null),
+      squares: props.board,
       xIsNext: true,
     };
   }
@@ -32,6 +35,7 @@ class Board extends React.Component {
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({squares: squares, xIsNext: !this.state.xIsNext,});
+    this.props.boardActions.saveBoard(squares);
   }
 
   render() {
@@ -64,6 +68,23 @@ class Board extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+      board: state.boardReducer.board,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    boardActions: bindActionCreators(boardActions, dispatch)
+  }
+}
+
+const Board = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(BoardComponent);
 
 class Game extends React.Component {
   render() {
